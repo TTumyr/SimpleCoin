@@ -1,0 +1,18 @@
+## Interface: 90002
+# Interface: 11305
+## Title: SimpleCoin
+## Notes: Money statistics for realm
+## Version: 0.1.1
+## Author: Tumyr
+## SavedVariables: SimpleCoinData
+## DefaultState: enabled
+## OptionalDeps:
+## RequiredDeps:
+## Dependencies:
+## LoadOnDemand: 0
+## LoadWith:
+## Notes:
+## X-Website: https://tumyr.dev
+
+includes.xml
+core.lua

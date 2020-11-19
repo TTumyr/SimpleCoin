@@ -1,0 +1,11 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+<Include file="lua/templates.lua"/>
+<Include file="lua/init.lua"/>
+<Include file="lua/functions.lua"/>
+<Include file="gui/main.lua"/>
+<Include file="gui/options.lua"/>
+<Include file="gui/icon.lua"/>
+<Include file="gui/coin_overlay.lua"/>
+</Ui>
