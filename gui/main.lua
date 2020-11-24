@@ -21,7 +21,7 @@ SimpleCoin:EnableMouse(true)
 -- set movable and resizeable
 simplecoin_set_resizable(SimpleCoin)
 simplecoin_set_movable(SimpleCoin)
-SimpleCoin:SetMinResize(420, 260)
+SimpleCoin:SetMinResize(260, 240)
 SimpleCoin:SetMaxResize(900, 600)
 SimpleCoin:SetFrameLevel(1)
 -- main display frame
@@ -121,9 +121,9 @@ simplecoin_set_resizable(SimpleCoin.char_list.data)
 SimpleCoin.char_list.scrollFrame:SetScrollChild(SimpleCoin.char_list.data)
 -- coin widget
 SimpleCoin.main_frame.coin_display = CreateFrame("Frame", "$parent_CoinWidget", SimpleCoin.main_frame, sc_AddonBackdropTemplate)
-SimpleCoin.main_frame.coin_display:SetWidth(SimpleCoin.main_frame.coin_display:GetParent():GetParent():GetWidth() - 60)
+SimpleCoin.main_frame.coin_display:SetWidth(SimpleCoin.main_frame.coin_display:GetParent():GetWidth())
 SimpleCoin.main_frame.coin_display:SetHeight(80)
-SimpleCoin.main_frame.coin_display:SetMinResize(340, 80)
+SimpleCoin.main_frame.coin_display:SetMinResize(200, 80)
 simplecoin_set_resizable(SimpleCoin.main_frame.coin_display)
 SimpleCoin.main_frame.coin_display:ClearAllPoints()
 SimpleCoin.main_frame.coin_display:SetPoint("BOTTOM", 0, 0)
@@ -136,7 +136,7 @@ SimpleCoin.main_frame.coin_display:SetBackdrop(
 		edgeSize = 8
 	}
 )
-simplecoin_coin_widget(SimpleCoin.main_frame.coin_display, nil, nil, true)
+simplecoin_coin_widget(SimpleCoin.main_frame.coin_display, nil, {-4, 0, -4, 6}, true)
 -- Resize button
 SimpleCoin.resize = CreateFrame("Button", "$parent_Move", SimpleCoin, sc_AddonBackdropTemplate)
 SimpleCoin.resize:SetSize(16, 16)

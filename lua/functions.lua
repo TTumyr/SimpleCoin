@@ -1,8 +1,9 @@
-local coinframe_chkbox, coinframes, data, faction_tilesize_overlay, faction_tilesize_list, textx, texty, sc_opposite_faction, settings
+local coinframe_chkbox, coinframes, data, faction_tilesize_overlay, faction_tilesize_list, sc_coin_realm, textx, texty, sc_coin_realm, sc_opposite_faction, settings
 local sc_realm = GetRealmName()
 local sc_faction = UnitFactionGroup("player")
 local sc_player = GetUnitName("player")
 -- copper
+local getMoney = 0
 local sc_total_copper = 0
 local sc_realm_copper = 0
 local sc_faction_copper = 0
@@ -43,13 +44,35 @@ if (sc_faction == "Alliance") then
 else
     sc_opposite_faction = "Alliance"
 end
--- version dependent
+-- layout data for the SimpleCoin icon
 if (sc_wowtextversion == "Classic") then
     faction_tilesize_list = 20
     faction_tilesize_overlay = 16
 else
     faction_tilesize_list = 16
     faction_tilesize_overlay = 12
+end
+-- set up coin display shortend realm name
+if (#sc_realm > 10) then
+    local string_split = {strsplit(" ", sc_realm)}
+    local ret_string = {}
+    local long_str = math.max(#unpack(string_split))
+    local abbr_done = false
+    for k, v in pairs(string_split) do
+        if (#v == long_str and not abbr_done) then
+            if (#string_split > 1) then
+                tinsert(ret_string, string.sub(v, 1, 1) .. ".")
+            else
+                tinsert(ret_string, string.sub(v, 1, 10))
+            end
+            abbr_done = true
+        else
+            tinsert(ret_string, v)
+        end
+    end
+    sc_coin_realm = strjoin(" ", unpack(ret_string))
+else
+    sc_coin_realm = sc_realm
 end
 -- setup datastorage
 function simplecoin_var_setup()
@@ -124,7 +147,7 @@ function simplecoin_coin_pos(self)
     sc_coin_hgt_crnd = true
 end
 -- main window character data
-function fill_main_data()
+function simplecoin_fill_main_data()
     local charListy = -5
     function create_faction_plate(faction)
         SimpleCoin.char_list.data[faction] = CreateFrame("Frame", "$parent_Name" .. faction, SimpleCoin.char_list.data, sc_AddonBackdropTemplate)
@@ -143,7 +166,7 @@ function fill_main_data()
                 tileSize = faction_tilesize_list
             }
         )
-        -- faction characters display frame
+        -- frame for faction characters display
         SimpleCoin.char_list.data[faction].Text = SimpleCoin.char_list.data:CreateFontString()
         SimpleCoin.char_list.data[faction].Text:SetFontObject("GameFontNormalSmall")
         SimpleCoin.char_list.data[faction].Text:SetText(faction)
@@ -196,7 +219,7 @@ function fill_main_data()
     -- set char_list.data height based on amount of lines/characters
     SimpleCoin.char_list.data:SetHeight(math.abs(charListy) + 20)
 end
--- initial GUI settinggs
+-- Initial GUI settinggs
 function simplecoin_gui_initial_setup()
     function simplecoin_set_coinframe_icon(self, symbol)
         self:SetBackdrop(
@@ -220,7 +243,7 @@ function simplecoin_gui_initial_setup()
         SimpleCoin:Hide()
     end
     -- display character list
-    fill_main_data()
+    simplecoin_fill_main_data()
     -- options window
     for k, v in pairs(coinframe_chkbox) do
         v:SetChecked(data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["coin_overlay"]["switches"][k])
@@ -229,7 +252,7 @@ function simplecoin_gui_initial_setup()
     SimpleCoin.options.chk_frame.box_chat_player:SetChecked(data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["chatline_player"])
     SimpleCoin.options.chk_frame.box_chat_all:SetChecked(data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["chatline_allchars"])
 end
--- event related functions
+-- Event related functions
 function simplecoin_onevent(self, event)
     if (event == "ADDON_LOADED") then
         coinframe_chkbox = {
@@ -246,9 +269,14 @@ function simplecoin_onevent(self, event)
             SimpleCoin_olay.realm,
             SimpleCoin_olay.all_realms
         }
+        -- adjust width of main frame coin widget elements
+        local sc_cw_ch = {SimpleCoin.main_frame.coin_display:GetChildren()}
+        for k, v in pairs(sc_cw_ch) do
+            v:SetWidth(v:GetParent():GetWidth())
+        end
     end
     if (event == "VARIABLES_LOADED") then
-        -- setup data from saved variables
+        -- Setup data from saved variables
         settings = SimpleCoinSettings
         data = SimpleCoinData
         simplecoin_var_setup()
@@ -272,6 +300,7 @@ function simplecoin_onevent(self, event)
 end
 -- change in money / display money routine
 function simplecoin_copperchange()
+    getMoney = GetMoney()
     if (data == nil) then
         data = SimpleCoinData
     end
@@ -282,7 +311,7 @@ function simplecoin_copperchange()
     sc_total_copper = 0
     -- get player money
     if (data["realms"][sc_realm][sc_faction]["characters"][tostring(sc_player)]["copper"] ~= nil) then
-        data["realms"][sc_realm][sc_faction]["characters"][tostring(sc_player)]["copper"] = GetMoney()
+        data["realms"][sc_realm][sc_faction]["characters"][tostring(sc_player)]["copper"] = getMoney
     end
     -- get faction money
     if (sc_faction_copper == 0) then
@@ -293,7 +322,7 @@ function simplecoin_copperchange()
         end
     end
     if (data["realms"][sc_realm][sc_faction]["copper"] ~= nil) then
-        data["realms"][sc_realm][sc_faction]["copper"] = sc_faction_copper + GetMoney()
+        data["realms"][sc_realm][sc_faction]["copper"] = sc_faction_copper + getMoney
     end
     -- realm copper from both factions
     if (sc_realm_copper == 0) then
@@ -324,10 +353,11 @@ end
 function simplecoin_update_display()
     function simplecoin_update_display_coin_frame(self)
         self.player.text:SetText(colorTable[UnitClass("player")] .. sc_player .. colorTable["White"] .. ":")
-        self.player.copper:SetText(colorTable["White"] .. GetCoinTextureString(GetMoney()))
-        self.player_faction.text:SetText(colorTable["Grey"] .. "(" .. colorTable[sc_faction] .. sc_faction .. colorTable["Grey"] .. ")|r " .. sc_realm .. colorTable["White"] .. ":")
-        self.player_faction.copper:SetText(colorTable["White"] .. GetCoinTextureString(sc_faction_copper + GetMoney()))
-        self.opposite_faction.text:SetText(colorTable["Grey"] .. "(" .. colorTable[sc_opposite_faction] .. sc_opposite_faction .. colorTable["Grey"] .. ")|r " .. sc_realm .. colorTable["White"] .. ":")
+        self.player.copper:SetText(colorTable["White"] .. GetCoinTextureString(getMoney))
+        self.player_faction.text:SetText(colorTable["Grey"] .. "(" .. colorTable[sc_faction] .. sc_faction .. colorTable["Grey"] .. ")|r " .. sc_coin_realm .. colorTable["White"] .. ":")
+        self.player_faction.copper:SetText(colorTable["White"] .. GetCoinTextureString(sc_faction_copper + getMoney))
+        -- TODO this can be moved to update only once!
+        self.opposite_faction.text:SetText(colorTable["Grey"] .. "(" .. colorTable[sc_opposite_faction] .. sc_opposite_faction .. colorTable["Grey"] .. ")|r " .. sc_coin_realm .. colorTable["White"] .. ":")
         self.opposite_faction.copper:SetText(colorTable["White"] .. GetCoinTextureString(sc_opposite_faction_copper))
         self.realm.text:SetText(sc_realm .. colorTable["White"] .. ":")
         self.realm.copper:SetText(colorTable["White"] .. GetCoinTextureString(data["realms"][sc_realm]["copper"]))
@@ -336,13 +366,13 @@ function simplecoin_update_display()
     end
     -- set total copper on character list display
     SimpleCoin.char_list.data[sc_faction].copper:SetText(colorTable["White"] .. GetCoinTextureString(data["realms"][sc_realm][sc_faction]["copper"]))
-    SimpleCoin.char_list.data[sc_faction].faction_data.player_Copper:SetText(colorTable["White"] .. GetCoinTextureString(GetMoney()))
+    SimpleCoin.char_list.data[sc_faction].faction_data.player_Copper:SetText(colorTable["White"] .. GetCoinTextureString(getMoney))
     -- chat display
     if (data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["chatline_player"]) then
-        print(colorTable[UnitClass("player")] .. sc_player .. "|r: " .. GetCoinTextureString(GetMoney()))
+        print(colorTable[UnitClass("player")] .. sc_player .. "|r: " .. GetCoinTextureString(getMoney))
     end
     if (data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["chatline_allchars"]) then
-        print("Total on " .. colorTable[UnitClass("player")] .. sc_realm .. "|r: " .. GetCoinTextureString(sc_faction_copper + GetMoney()))
+        print("Total on " .. colorTable[UnitClass("player")] .. sc_realm .. "|r: " .. GetCoinTextureString(sc_faction_copper + getMoney))
     end
     -- coin overlay and main coin frame
     simplecoin_update_display_coin_frame(SimpleCoin_olay)
@@ -368,19 +398,18 @@ function simplecoin_disp_screen_currency()
     -- to counter strange pos shift in WoW
     local point, rel, relP, xof, yof = unpack(data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["coin_overlay"]["pos"])
     local prevHeight = SimpleCoin_olay:GetHeight()
-    --
     for k, v in pairs(coinframes) do
         if (data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["coin_overlay"]["switches"][k]) then
             v:Show()
             v:ClearAllPoints()
             v:SetPoint("TOPLEFT", 0, coinElementsY)
-            coinElementsY = coinElementsY - 14
+            v:SetPoint("TOPRIGHT", 0, coinElementsY)
+            coinElementsY = coinElementsY - SimpleCoin_olay.l_height
         else
             v:Hide()
         end
     end
     SimpleCoin_olay:SetHeight(coinElementsY)
-    -- to counter strange pos shift in WoW
     if (sc_coin_hgt_crnd == true) then
         if (point ~= nil) then
             if rel ~= nil then
@@ -404,6 +433,8 @@ function simplecoin_disp_screen_currency()
             SimpleCoin_olay:SetPoint("CENTER", UIParent, "CENTER")
         end
     end
+    SimpleCoin_olay:SetMinResize(200, SimpleCoin_olay:GetHeight())
+    SimpleCoin_olay:SetMaxResize(700, SimpleCoin_olay:GetHeight())
     sc_coin_hgt_crnd = false
     --
     if (data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["coin_overlay"]["transparent"]) then
@@ -421,6 +452,7 @@ function simplecoin_disp_screen_currency()
             }
         )
     end
+    -- TODO get this cleaner
     local coinCheckVisible = 0
     for k, v in pairs(data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["coin_overlay"]["switches"]) do
         if (data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["coin_overlay"]["switches"][k]) then
@@ -438,8 +470,6 @@ function simplecoin_showoptions()
         SimpleCoin.options:Hide()
         SimpleCoin.btn_options:SetNormalTexture("Interface\\addons\\SimpleCoin\\img\\UI-MicroButton-MainMenu-Up")
     else
-        SimpleCoin_icon:ClearAllPoints()
-        SimpleCoin_icon:SetPoint("TOPRIGHT", UIParent, "TOPRIGHT", -200, -160)
         SimpleCoin.options:Show()
         SimpleCoin.btn_options:SetNormalTexture("Interface\\addons\\SimpleCoin\\img\\UI-MicroButton-MainMenu-Down")
     end
@@ -460,6 +490,7 @@ function simplecoin_coinframe_toggle(self)
             self:SetChecked(data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["coin_overlay"]["switches"][id])
         end
     end
+    -- TODO cleanup options checkbox
     if (self == SimpleCoin.options.chk_frame.screen_display_transparent) then
         data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["coin_overlay"]["transparent"] = not data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["coin_overlay"]["transparent"]
         self:SetChecked(data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["coin_overlay"]["transparent"])
@@ -504,8 +535,34 @@ function simplecoin_frame_resize(self, motion, savename)
             self:GetParent().char_list.data:SetWidth(math.floor(self:GetParent():GetWidth()))
             self:GetParent().char_list.data:GetChildren():SetWidth(math.floor(self:GetParent():GetWidth()))
             self:GetParent().char_list:SetHeight(math.floor(self:GetParent():GetHeight() - 60))
+            self:GetParent().main_frame.coin_display:SetWidth(SimpleCoin.main_frame.coin_display:GetParent():GetParent():GetWidth() - 30)
+            local coin_ch = {self:GetParent().main_frame.coin_display:GetChildren()}
+            for k, v in pairs(coin_ch) do
+                v:SetWidth(self:GetParent().main_frame.coin_display:GetParent():GetWidth() - 30)
+            end
             self:GetParent().main_frame:SetPoint("TOPLEFT")
             self:GetParent().main_frame:SetPoint("BOTTOMRIGHT", 0, 30)
+            self:GetParent():StopMovingOrSizing()
+        end
+    )
+end
+function simplecoin_olay_resize(self, motion, savename)
+    self:SetScript(
+        "OnMouseDown",
+        function(self, button)
+            self:GetParent():StartSizing("BOTTOMRIGHT")
+        end
+    )
+    self:SetScript(
+        "OnMouseUp",
+        function(self, button)
+            local coin_ch = {self:GetParent():GetChildren()}
+            for k, v in pairs(coin_ch) do
+                if (v ~= SimpleCoin_olay.resize) then
+                    v:SetWidth(self:GetParent():GetWidth())
+                end
+            end
+            self:GetParent():StopMovingOrSizing()
         end
     )
 end
