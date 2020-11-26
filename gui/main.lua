@@ -29,8 +29,10 @@ SimpleCoin.main_frame = CreateFrame("Frame", "$parent_MoveFrame", SimpleCoin, sc
 SimpleCoin.main_frame:SetWidth(SimpleCoin.main_frame:GetParent():GetWidth())
 SimpleCoin.main_frame:SetHeight(SimpleCoin.main_frame:GetParent():GetHeight() - 20)
 SimpleCoin.main_frame:ClearAllPoints()
-SimpleCoin.main_frame:SetPoint("TOPLEFT", simpleCoin, "TOPLEFT")
-SimpleCoin.main_frame:SetPoint("BOTTOMRIGHT", simpleCoin, "BOTTOMRIGHT", 0, -30)
+SimpleCoin.main_frame:SetPoint("TOPLEFT")
+SimpleCoin.main_frame:SetPoint("TOPRIGHT")
+SimpleCoin.main_frame:SetPoint("BOTTOMLEFT", 0, -30)
+SimpleCoin.main_frame:SetPoint("BOTTOMRIGHT", 0, -30)
 -- set movable and resizeable
 simplecoin_set_resizable(SimpleCoin.main_frame)
 simplecoin_set_movable(SimpleCoin.main_frame)
@@ -38,9 +40,12 @@ SimpleCoin.main_frame:RegisterForDrag("LeftButton")
 SimpleCoin.main_frame:SetScript(
 	"OnDragStart",
 	function(self)
-		self:ClearAllPoints()
-		self:SetPoint("TOPLEFT")
-		self:SetPoint("BOTTOMRIGHT", 0, 30)
+		self:GetParent().main_frame:ClearAllPoints()
+		self:GetParent().main_frame:SetPoint("TOPLEFT")
+		self:GetParent().main_frame:SetPoint("BOTTOMRIGHT", 0, 30)
+		self:GetParent().char_list.data:ClearAllPoints()
+		self:GetParent().char_list.data:SetPoint("TOPLEFT")
+		self:GetParent().char_list.data:SetPoint("TOPRIGHT")
 		self:GetParent():StartMoving()
 	end
 )
@@ -48,11 +53,6 @@ SimpleCoin.main_frame:SetScript(
 	"OnDragStop",
 	function(self)
 		self:GetParent():StopMovingOrSizing()
-		self:SetWidth(self:GetParent():GetWidth())
-		self:SetHeight(self:GetParent():GetHeight() - 20)
-		self:ClearAllPoints()
-		self:SetPoint("TOPLEFT")
-		self:SetPoint("BOTTOMRIGHT", 0, 30)
 	end
 )
 -- header title
@@ -106,27 +106,29 @@ SimpleCoin.char_list:SetBackdrop(
 	}
 )
 -- scrollframe
-SimpleCoin.char_list.scrollFrame = CreateFrame("ScrollFrame", "$parent_scroll", SimpleCoin.char_list, "UIPanelScrollFrameTemplate")
-SimpleCoin.char_list.scrollFrame:ClearAllPoints()
-SimpleCoin.char_list.scrollFrame:SetPoint("TOPLEFT", -28, -8)
-SimpleCoin.char_list.scrollFrame:SetPoint("BOTTOMRIGHT", -28, 6)
+SimpleCoin.char_list.scrollframe = CreateFrame("ScrollFrame", "$parent_scroll", SimpleCoin.char_list, "UIPanelScrollFrameTemplate")
+SimpleCoin.char_list.scrollframe:ClearAllPoints()
+SimpleCoin.char_list.scrollframe:SetAllPoints(SimpleCoin.char_list)
+SimpleCoin.char_list.scrollframe:SetPoint("TOPLEFT", -28, -8)
+SimpleCoin.char_list.scrollframe:SetPoint("BOTTOMRIGHT", -28, 6)
+SimpleCoin.char_list.scrollframe:SetWidth(SimpleCoin.char_list.scrollframe:GetParent():GetWidth())
 -- scroll child frame
 SimpleCoin.char_list.data = CreateFrame("Frame", "$parent_Data", SimpleCoin.char_list, sc_AddonBackdropTemplate)
-SimpleCoin.char_list.data:SetWidth(SimpleCoin.char_list.data:GetParent():GetWidth())
-SimpleCoin.char_list.data:SetHeight(200)
-SimpleCoin.char_list.data:ClearAllPoints()
-SimpleCoin.char_list.data:SetPoint("TOPLEFT", 10, -30)
-SimpleCoin.char_list.data:SetPoint("BOTTOMRIGHT", -10, 0)
 simplecoin_set_resizable(SimpleCoin.char_list.data)
-SimpleCoin.char_list.scrollFrame:SetScrollChild(SimpleCoin.char_list.data)
+SimpleCoin.char_list.scrollframe:SetScrollChild(SimpleCoin.char_list.data)
+SimpleCoin.char_list.data:ClearAllPoints()
+SimpleCoin.char_list.data:SetAllPoints(SimpleCoin.char_list.scrollframe)
+SimpleCoin.char_list.data:SetWidth(SimpleCoin.char_list.scrollframe:GetWidth())
+SimpleCoin.char_list.data:SetHeight(1)
 -- coin widget
 SimpleCoin.main_frame.coin_display = CreateFrame("Frame", "$parent_CoinWidget", SimpleCoin.main_frame, sc_AddonBackdropTemplate)
 SimpleCoin.main_frame.coin_display:SetWidth(SimpleCoin.main_frame.coin_display:GetParent():GetWidth())
-SimpleCoin.main_frame.coin_display:SetHeight(80)
-SimpleCoin.main_frame.coin_display:SetMinResize(200, 80)
+SimpleCoin.main_frame.coin_display:SetHeight(1)
 simplecoin_set_resizable(SimpleCoin.main_frame.coin_display)
 SimpleCoin.main_frame.coin_display:ClearAllPoints()
 SimpleCoin.main_frame.coin_display:SetPoint("BOTTOM", 0, 0)
+SimpleCoin.main_frame.coin_display:SetPoint("LEFT", 10, 0)
+SimpleCoin.main_frame.coin_display:SetPoint("RIGHT", -10, 0)
 SimpleCoin.main_frame.coin_display:SetBackdrop(
 	{
 		bgFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Background",
@@ -136,7 +138,7 @@ SimpleCoin.main_frame.coin_display:SetBackdrop(
 		edgeSize = 8
 	}
 )
-simplecoin_coin_widget(SimpleCoin.main_frame.coin_display, nil, {-4, 0, -4, 6}, true)
+simplecoin_coin_widget(SimpleCoin.main_frame.coin_display, nil, {-4, -2, -4, 2}, true)
 -- Resize button
 SimpleCoin.resize = CreateFrame("Button", "$parent_Move", SimpleCoin, sc_AddonBackdropTemplate)
 SimpleCoin.resize:SetSize(16, 16)

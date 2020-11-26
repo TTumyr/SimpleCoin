@@ -8,7 +8,6 @@ simplecoin_set_movable(SimpleCoin_olay)
 simplecoin_set_resizable(SimpleCoin_olay)
 SimpleCoin_olay:SetMinResize(200, 20)
 SimpleCoin_olay:SetMaxResize(700, 72)
--- Background for adjustment
 SimpleCoin_olay:SetBackdrop(
     {
         bgFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Background",

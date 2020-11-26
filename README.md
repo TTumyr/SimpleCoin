@@ -14,6 +14,12 @@ Unpack the relevant ZIP file in the respective WoW addon folder
 
 ## Version history
 
+#### 0.1.3 -- 2020-11-26
+
+- Added option to delete characters from the list
+- Added large number separator
+- Frame layout and resizing should now work properly
+
 #### 0.1.2 -- 2020-11-24
 
 - Main window
