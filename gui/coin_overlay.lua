@@ -34,7 +34,7 @@ end
 -- global overlay line height
 SimpleCoin_olay.l_height = 10
 local l_h = SimpleCoin_olay.l_height
-simplecoin_coin_widget(SimpleCoin_olay, {l_h, l_h, l_h, l_h, l_h}, {0, 0, 0, 0})
+simplecoin_coin_widget(SimpleCoin_olay, {l_h, l_h, l_h, l_h, l_h, l_h, l_h}, {0, 0, 0, 0})
 
 -- Resize button
 SimpleCoin_olay.resize = CreateFrame("Button", "$parent_Move", SimpleCoin_olay, sc_AddonBackdropTemplate)

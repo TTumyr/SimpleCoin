@@ -1,5 +1,7 @@
 -- pos variables
 local coin_font, padding, faction_tilesize, fr_left, fr_right, fr_pos_y, ic_left, ic_pos_y, txt_left, txt_right, txt_y, text_pos_y, y_inc
+-- Global functions
+simplecoin_main_cw_height = 0
 -- set variables for coinframe
 function simplecoin_get_coinwidget_vars(p_y_pos_inc, p_pad, p_line, p_in_font, p_y_pos_inc)
     faction_tilesize = 20
@@ -14,7 +16,7 @@ function simplecoin_get_coinwidget_vars(p_y_pos_inc, p_pad, p_line, p_in_font, p
     text_pos_y = 0
     coin_font = in_font or "GameFontNormalSmall"
     padding = p_pad or {-4, 0, -4, 0}
-    y_inc = p_y_pos_inc or {22, 14, 14, 22, 14}
+    y_inc = p_y_pos_inc or {20, 14, 14, 20, 14, 14, 14}
 end
 -- coin widget incremental Y position
 function simplecoin_cw_increaseY(inc)
@@ -65,11 +67,23 @@ function simplecoin_coin_widget(self, p_y_pos_inc, p_pad, p_line, p_in_font)
     -- y increments
     simplecoin_cw_increaseY(y_inc[4])
 
+    -- player faction total
+    self.player_faction_total = CreateFrame("Frame", "$parent_Realm", self, sc_AddonBackdropTemplate)
+    simplecoin_coinwidget_unit(self.player_faction_total, nil, 1)
+    -- y increments
+    simplecoin_cw_increaseY(y_inc[5])
+
+    -- opposite faction total
+    self.opposite_faction_total = CreateFrame("Frame", "$parent_Realm", self, sc_AddonBackdropTemplate)
+    simplecoin_coinwidget_unit(self.opposite_faction_total, nil, 1)
+    -- y increments
+    simplecoin_cw_increaseY(y_inc[6])
+
     -- all realms
     self.all_realms = CreateFrame("Frame", "$parent_Realm", self, sc_AddonBackdropTemplate)
     simplecoin_coinwidget_unit(self.all_realms, nil, 1)
     -- y increments
-    simplecoin_cw_increaseY(y_inc[5])
+    simplecoin_cw_increaseY(y_inc[7])
     -- draw deco lines
     function simplecoin_deco_line(self)
         local line = self:CreateLine()
@@ -80,10 +94,13 @@ function simplecoin_coin_widget(self, p_y_pos_inc, p_pad, p_line, p_in_font)
     end
     if (p_line) then
         simplecoin_deco_line(self.player_faction)
-        simplecoin_deco_line(self.all_realms)
+        simplecoin_deco_line(self.player_faction_total)
     end
     -- set total height of coin widget
     self:SetHeight(abs(fr_pos_y) + abs(padding[1] + padding[3] * 2))
+    if (self == SimpleCoin.main_frame.coin_display) then
+        simplecoin_main_cw_height = abs(fr_pos_y) + abs(padding[1] + padding[3] * 2)
+    end
 end
 
 -- check boxes

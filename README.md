@@ -1,4 +1,4 @@
-# SimpleCoin 0.1.2
+# SimpleCoin 0.1.4
 
 Money tracking addon for World of Warcraft retail (9.0.2) and classic (1.13.5)
 
@@ -13,6 +13,11 @@ The ZIP file contains 2 ZIP archives:
 Unpack the relevant ZIP file in the respective WoW addon folder
 
 ## Version history
+
+#### 0.1.4 -- 2020-11-29
+
+- Added additional items on statistics display
+- General bugfix
 
 #### 0.1.3 -- 2020-11-26
 

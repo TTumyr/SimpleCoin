@@ -25,7 +25,7 @@ SimpleCoin:SetMinResize(260, 240)
 SimpleCoin:SetMaxResize(900, 600)
 SimpleCoin:SetFrameLevel(1)
 -- main display frame
-SimpleCoin.main_frame = CreateFrame("Frame", "$parent_MoveFrame", SimpleCoin, sc_AddonBackdropTemplate)
+SimpleCoin.main_frame = CreateFrame("Frame", "$parent_MainFrame", SimpleCoin, sc_AddonBackdropTemplate)
 SimpleCoin.main_frame:SetWidth(SimpleCoin.main_frame:GetParent():GetWidth())
 SimpleCoin.main_frame:SetHeight(SimpleCoin.main_frame:GetParent():GetHeight() - 20)
 SimpleCoin.main_frame:ClearAllPoints()
@@ -91,11 +91,15 @@ SimpleCoin.btn_reset:SetNormalFontObject(GameFontNormalSmall)
 SimpleCoin.btn_reset:SetHighlightFontObject(GameFontNormalSmall)
 SimpleCoin.btn_reset:SetText("ResetGUI")
 SimpleCoin.btn_reset:SetScript("OnClick", reset_windows)
+-- realm menu
+-- SimpleCoin.realm_select = CreateFrame("Frame", "Omen_TitleDropDownMenu")
+-- SimpleCoin.realm_select.displayMode = "MENU"
+-- SimpleCoin.realm_select.initialize = function(self, level) end
 -- character list
 SimpleCoin.char_list = CreateFrame("Frame", "$parent_CharacterList", SimpleCoin.main_frame, sc_AddonBackdropTemplate)
 SimpleCoin.char_list:ClearAllPoints()
 SimpleCoin.char_list:SetPoint("TOPLEFT", 10, -30)
-SimpleCoin.char_list:SetPoint("BOTTOMRIGHT", -10, 114)
+SimpleCoin.char_list:SetPoint("BOTTOMRIGHT", -10, 144)
 SimpleCoin.char_list:SetBackdrop(
 	{
 		bgFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Background",
@@ -135,7 +139,7 @@ SimpleCoin.main_frame.coin_display:SetBackdrop(
 		edgeFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Gold-Border",
 		tile = "true",
 		tileSize = 32,
-		edgeSize = 8
+		edgeSize = 16
 	}
 )
 simplecoin_coin_widget(SimpleCoin.main_frame.coin_display, nil, {-4, -2, -4, 2}, true)
