@@ -10,8 +10,8 @@ SimpleCoin_olay:SetMinResize(200, 20)
 SimpleCoin_olay:SetMaxResize(700, 72)
 SimpleCoin_olay:SetBackdrop(
     {
-        bgFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Background",
-        tile = "false",
+        bgFile = "Interface\\addons\\SimpleCoin\\img\\Black-Background",
+        tile = true,
         tileSize = 32
     }
 )

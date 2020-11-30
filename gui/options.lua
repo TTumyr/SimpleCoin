@@ -7,22 +7,31 @@ SimpleCoin.options:ClearAllPoints()
 SimpleCoin.options:SetPoint("TOPRIGHT", SimpleCoin.main_frame, "TOPRIGHT", SimpleCoin.options:GetWidth(), 0)
 SimpleCoin.options:SetBackdrop(
     {
-        bgFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Background",
-        edgeFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Border",
-        tile = "true",
-        tileSize = 32,
-        edgeSize = 32,
-        insets = {left = 11, right = 12, top = 12, bottom = 11}
+        bgFile = "Interface\\addons\\SimpleCoin\\img\\bg-marble",
+        edgeFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-TestWatermark-Border",
+        tile = false,
+        tileSize = 256,
+        edgeSize = 4,
+        insets = {left = 0, right = 1, top = 0, bottom = 1}
     }
 )
 SimpleCoin.options:SetMinResize(300, 200)
 SimpleCoin.options:SetMaxResize(900, 600)
 
 -- Checkboxes section
-SimpleCoin.options.chk_frame = CreateFrame("Frame", "$parent_Checkboxes", SimpleCoin.options)
+SimpleCoin.options.chk_frame = CreateFrame("Frame", "$parent_Checkboxes", SimpleCoin.options, sc_AddonBackdropTemplate)
 SimpleCoin.options.chk_frame:SetWidth(SimpleCoin.options.chk_frame:GetParent():GetWidth())
-SimpleCoin.options.chk_frame:SetHeight(160)
+SimpleCoin.options.chk_frame:SetHeight(200)
 SimpleCoin.options.chk_frame:SetPoint("TOPLEFT", 0, 0)
+SimpleCoin.options.chk_frame:SetPoint("BOTTOMRIGHT", 0, 0)
+SimpleCoin.options.chk_frame:SetBackdrop(
+    {
+        bgFile = "Interface\\addons\\SimpleCoin\\img\\Black-Background",
+        tile = true,
+        tileSize = 32
+    }
+)
+SimpleCoin.options.chk_frame:SetBackdropColor(1, 1, 1, simplecoin_bg_med_opac)
 SimpleCoin.options.chk_frame:SetClampedToScreen(true)
 SimpleCoin.options.chk_frame.label_screen = SimpleCoin.options.chk_frame:CreateFontString()
 SimpleCoin.options.chk_frame.label_screen:SetFontObject("GameFontNormalSmall")

@@ -1,7 +1,6 @@
 -- pos variables
 local coin_font, padding, faction_tilesize, fr_left, fr_right, fr_pos_y, ic_left, ic_pos_y, txt_left, txt_right, txt_y, text_pos_y, y_inc
--- Global functions
-simplecoin_main_cw_height = 0
+
 -- set variables for coinframe
 function simplecoin_get_coinwidget_vars(p_y_pos_inc, p_pad, p_line, p_in_font, p_y_pos_inc)
     faction_tilesize = 20

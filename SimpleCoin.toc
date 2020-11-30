@@ -2,7 +2,7 @@
 # Interface: 11305
 ## Title: SimpleCoin
 ## Notes: Money statistics for realm
-## Version: 0.1.4
+## Version: 0.2.0
 ## Author: Tumyr
 ## SavedVariables: SimpleCoinData
 ## DefaultState: enabled

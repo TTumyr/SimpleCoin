@@ -1,4 +1,4 @@
-local coinframe_chkbox, coinframes, data, faction_tilesize_overlay, faction_tilesize_list, sc_coin_realm, textx, texty, sc_coin_realm, sc_opposite_faction, settings
+local coinframe_chkbox, coinframes, data, faction_tilesize_overlay, faction_tilesize_list, sc_coin_realm, settings, textx, texty, sc_coin_realm, sc_opposite_faction
 local sc_realm = GetRealmName()
 local sc_faction = UnitFactionGroup("player")
 local sc_player = GetUnitName("player")
@@ -80,6 +80,9 @@ else
 end
 -- setup datastorage
 function simplecoin_var_setup()
+    if (settings["realm_select_menu"] == nil) then
+        settings["realm_select_menu"] = {}
+    end
     if (data["realms"]["copper"] == nil) then
         data["realms"]["copper"] = 0
     end
@@ -160,21 +163,18 @@ function simplecoin_onevent(self, event)
             SimpleCoin_olay.opposite_faction_total,
             SimpleCoin_olay.all_realms
         }
-        -- adjust width of main frame coin widget elements
-        local sc_cw_ch = {SimpleCoin.main_frame.coin_display:GetChildren()}
-        for k, v in pairs(sc_cw_ch) do
-            v:SetWidth(v:GetParent():GetWidth())
-        end
     end
     if (event == "VARIABLES_LOADED") then
         -- setup data from saved variables
         settings = SimpleCoinSettings
         data = SimpleCoinData
         simplecoin_var_setup()
-        simplecoin_get_static_copper()
-        simplecoin_disp_screen_currency()
         -- interface configuration
         simplecoin_gui_initial_setup()
+        simplecoin_realmselector_menu()
+        -- get realm data
+        simplecoin_get_static_copper()
+        simplecoin_disp_screen_currency()
         -- coin overlay and main coin frame
         simplecoin_update_display_cw_text(SimpleCoin_olay)
         simplecoin_update_display_cw_text(SimpleCoin.main_frame.coin_display)
@@ -327,6 +327,10 @@ function simplecoin_update_display_cw_copper(self)
     self.all_realms.copper:SetText(colorTable["White"] .. simplecoin_reformat_coinstring(GetCoinTextureString(sc_total_copper + sc_realm_copper + getMoney)))
 end
 function simplecoin_update_display()
+    -- set copper on realm selector
+    if (SimpleCoin.realm_select.realm_name:GetText() == sc_realm) then
+        SimpleCoin.realm_select.realm_copper:SetText(colorTable["White"] .. simplecoin_reformat_coinstring(GetCoinTextureString(data["realms"][sc_realm]["copper"])))
+    end
     -- set total copper on character list display
     if (SimpleCoin.char_list.data[sc_realm][sc_faction] ~= nil) then
         SimpleCoin.char_list.data[sc_realm][sc_faction].copper:SetText(colorTable["White"] .. simplecoin_reformat_coinstring(GetCoinTextureString(sc_faction_copper + getMoney)))
@@ -399,11 +403,12 @@ function simplecoin_disp_screen_currency()
     else
         SimpleCoin_olay:SetBackdrop(
             {
-                bgFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Background",
-                tile = "false",
+                bgFile = "Interface\\addons\\SimpleCoin\\img\\Black-Background",
+                tile = true,
                 tileSize = 32
             }
         )
+        SimpleCoin_olay:SetBackdropColor(1, 1, 1, simplecoin_bg_trans_opac)
     end
     local coinCheckVisible = 0
     for k, v in pairs(data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["coin_overlay"]["switches"]) do
@@ -471,6 +476,40 @@ function simplecoin_chat_money_allchars(self)
     else
         self:SetChecked(true)
         data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["chatline_allchars"] = true
+    end
+end
+-- main window realm selector
+function simplecoin_realmselector_menu()
+    SimpleCoin.realm_select.realm_name:SetText(sc_realm)
+    local info = {}
+    SimpleCoin.realm_select_menu.initialize = function(self, level)
+        if not level then
+            return
+        end
+        wipe(info)
+        if level == 1 then
+            -- Create the title of the menu
+            info.isTitle = 1
+            info.text = "Select realm"
+            info.notCheckable = 1
+            UIDropDownMenu_AddButton(info, level)
+
+            info.disabled = nil
+            info.isTitle = nil
+            info.notCheckable = nil
+            for k, _ in pairs(data["realms"]) do
+                if (k ~= "copper") then
+                    info.text = "   " .. k .. "  --  " .. simplecoin_reformat_coinstring(GetCoinTextureString(data["realms"][k]["copper"]))
+                    info.notCheckable = 1
+                    info.func = function()
+                        SimpleCoin.realm_select.realm_name:SetText(k)
+                        SimpleCoin.realm_select.realm_copper:SetText(colorTable["White"] .. simplecoin_reformat_coinstring(GetCoinTextureString(data["realms"][k]["copper"])))
+                        simplecoin_set_visible_realm(k)
+                    end
+                    UIDropDownMenu_AddButton(info, level)
+                end
+            end
+        end
     end
 end
 -- main window character data
@@ -587,7 +626,6 @@ function simplecoin_fill_main_data()
         SimpleCoin.char_list.data[realm]:SetHeight(20)
         SimpleCoin.char_list.data[realm]:SetPoint("TOPLEFT")
         SimpleCoin.char_list.data[realm]:SetPoint("TOPRIGHT")
-
         -- first time player registers
         local player_found_in_data = false
 
@@ -616,7 +654,14 @@ function simplecoin_fill_main_data()
         -- end
     end
     -- create realm display
-    create_realm_plate()
+    for k, _ in pairs(data["realms"]) do
+        if (k ~= "copper") then
+            create_realm_plate(k)
+            charListy = -5
+        end
+    end
+    -- set initial visible realm
+    simplecoin_set_visible_realm(sc_realm)
     -- set char_list.data height based on amount of lines/characters
     SimpleCoin.char_list.data:SetHeight(math.abs(charListy))
 end
@@ -627,8 +672,25 @@ function table_length(tbl)
     end
     return count
 end
+-- handle active realm plate
+function simplecoin_set_visible_realm(self)
+    for k, _ in pairs(data["realms"]) do
+        if (k ~= "copper") then
+            if (k == self) then
+                SimpleCoin.char_list.data[k]:Show()
+            else
+                SimpleCoin.char_list.data[k]:Hide()
+            end
+        end
+    end
+end
 -- Initial GUI settinggs
 function simplecoin_gui_initial_setup()
+    -- adjust width of main frame coin widget elements
+    local sc_cw_ch = {SimpleCoin.main_frame.coin_display:GetChildren()}
+    for k, v in pairs(sc_cw_ch) do
+        v:SetWidth(v:GetParent():GetWidth())
+    end
     function simplecoin_set_coinframe_icon(self, symbol)
         self:SetBackdrop(
             {

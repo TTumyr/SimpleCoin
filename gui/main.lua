@@ -8,15 +8,14 @@ SimpleCoin.title = GetAddOnMetadata("SimpleCoin", "Title")
 SimpleCoin.version = GetAddOnMetadata("SimpleCoin", "Version")
 SimpleCoin:SetBackdrop(
 	{
-		bgFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Background",
-		edgeFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Border",
-		tile = "true",
-		tileSize = 32,
-		edgeSize = 32,
-		insets = {left = 11, right = 12, top = 12, bottom = 11}
+		bgFile = "Interface\\addons\\SimpleCoin\\img\\bg-marble",
+		edgeFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-TestWatermark-Border",
+		tile = false,
+		tileSize = 256,
+		edgeSize = 4,
+		insets = {left = 0, right = 0, top = 0, bottom = 0}
 	}
 )
-
 SimpleCoin:EnableMouse(true)
 -- set movable and resizeable
 simplecoin_set_resizable(SimpleCoin)
@@ -55,34 +54,49 @@ SimpleCoin.main_frame:SetScript(
 		self:GetParent():StopMovingOrSizing()
 	end
 )
+--
+SimpleCoin.header = CreateFrame("Frame", "$parent_Header", SimpleCoin, sc_AddonBackdropTemplate)
+SimpleCoin.header:SetWidth(SimpleCoin.header:GetParent():GetWidth())
+SimpleCoin.header:SetHeight(28)
+SimpleCoin.header:SetPoint("TOPLEFT", 0, 0)
+SimpleCoin.header:SetPoint("TOPRIGHT", 0, 0)
+SimpleCoin.header:SetBackdrop(
+	{
+		bgFile = "Interface\\addons\\SimpleCoin\\img\\Black-Background",
+		tile = true,
+		tileSize = 32
+	}
+)
+SimpleCoin.header:SetBackdropColor(1, 1, 1, simplecoin_bg_heavy_opac)
 -- header title
-SimpleCoin.header_title = SimpleCoin:CreateFontString()
-SimpleCoin.header_title:SetFontObject("GameFontNormalSmall")
-SimpleCoin.header_title:SetPoint("TOPLEFT", 12, -12)
+SimpleCoin.header_title = SimpleCoin.header:CreateFontString()
+SimpleCoin.header_title:SetFont("Fonts\\FRIZQT__.TTF", 16, "OUTLINE", "THICKOUTLINE", "MONOCHROME")
+SimpleCoin.header_title:SetFontObject("GameFontNormal")
+SimpleCoin.header_title:SetPoint("TOPLEFT", 10, -6)
 SimpleCoin.header_title:SetText(SimpleCoin.title)
 -- header version
-SimpleCoin.header_version = SimpleCoin:CreateFontString()
+SimpleCoin.header_version = SimpleCoin.header:CreateFontString()
 SimpleCoin.header_version:SetFont("Fonts\\FRIZQT__.TTF", 8)
-SimpleCoin.header_version:SetPoint("TOPRIGHT", -28, -14)
-SimpleCoin.header_version:SetText("v" .. SimpleCoin.version)
+SimpleCoin.header_version:SetPoint("TOPRIGHT", -28, -9)
+SimpleCoin.header_version:SetText("v." .. SimpleCoin.version)
 -- close button
-SimpleCoin.close = CreateFrame("Button", "$parent_Close", SimpleCoin.main_frame, "UIPanelCloseButton")
+SimpleCoin.close = CreateFrame("Button", "$parent_Close", SimpleCoin.header, "UIPanelCloseButton")
 SimpleCoin.close:SetWidth(24)
 SimpleCoin.close:SetHeight(24)
-SimpleCoin.close:SetPoint("TOPRIGHT", -5, -5)
+SimpleCoin.close:SetPoint("TOPRIGHT", -4, -1)
 SimpleCoin.close:SetScript("OnClick", simplecoin_closemain)
 SimpleCoin.main_frame:SetFrameLevel(2)
 -- options button
-SimpleCoin.btn_options = CreateFrame("Button", "$parent_options", SimpleCoin.main_frame, sc_AddonBackdropTemplate)
+SimpleCoin.btn_options = CreateFrame("Button", "$parent_options", SimpleCoin.header, sc_AddonBackdropTemplate)
 SimpleCoin.btn_options:SetWidth(16)
 SimpleCoin.btn_options:SetHeight(28)
-SimpleCoin.btn_options:SetPoint("TOPRIGHT", -54, 0)
+SimpleCoin.btn_options:SetPoint("TOPRIGHT", -64, 5)
 SimpleCoin.btn_options:SetNormalTexture("Interface\\addons\\SimpleCoin\\img\\UI-MicroButton-MainMenu-Up")
 SimpleCoin.btn_options:SetPushedTexture("Interface\\addons\\SimpleCoin\\img\\UI-MicroButton-MainMenu-Disabled")
 SimpleCoin.btn_options:SetHighlightTexture("Interface\\addons\\SimpleCoin\\img\\UI-MicroButton-MainMenu-Down")
 SimpleCoin.btn_options:SetScript("OnClick", simplecoin_showoptions)
 -- resetGUI button
-SimpleCoin.btn_reset = CreateFrame("Button", "$Parent_reset", SimpleCoin, "OptionsButtonTemplate")
+SimpleCoin.btn_reset = CreateFrame("Button", "$parent_reset", SimpleCoin, "OptionsButtonTemplate")
 SimpleCoin.btn_reset:SetWidth(60)
 SimpleCoin.btn_reset:SetHeight(20)
 SimpleCoin.btn_reset:SetPoint("BOTTOMRIGHT", -28, 10)
@@ -91,24 +105,49 @@ SimpleCoin.btn_reset:SetNormalFontObject(GameFontNormalSmall)
 SimpleCoin.btn_reset:SetHighlightFontObject(GameFontNormalSmall)
 SimpleCoin.btn_reset:SetText("ResetGUI")
 SimpleCoin.btn_reset:SetScript("OnClick", reset_windows)
+-- realm select button
+SimpleCoin.realm_select = CreateFrame("Button", "$parent_RealmSelect", SimpleCoin.main_frame, "OptionsButtonTemplate")
+--SimpleCoin.realm_select:SetWidth(60)
+SimpleCoin.realm_select:SetHeight(24)
+SimpleCoin.realm_select:SetPoint("TOPLEFT", 10, -40)
+SimpleCoin.realm_select:SetPoint("TOPRIGHT", -10, -60)
+-- Other code for the title's width/height/dragging to move Omen etc
+SimpleCoin.realm_select:SetScript(
+	"OnClick",
+	function(self, button, down)
+		if button == "LeftButton" then
+			ToggleDropDownMenu(1, nil, SimpleCoin.realm_select_menu, self:GetName(), 0, 0)
+		end
+	end
+)
+SimpleCoin.realm_select.realm_name = SimpleCoin.realm_select:CreateFontString()
+SimpleCoin.realm_select.realm_name:SetPoint("LEFT", 10, 0)
+SimpleCoin.realm_select.realm_name:SetFontObject("GameFontNormal")
+SimpleCoin.realm_select.realm_copper = SimpleCoin.realm_select:CreateFontString()
+SimpleCoin.realm_select.realm_copper:SetPoint("RIGHT", -10, 0)
+SimpleCoin.realm_select.realm_copper:SetFontObject("GameFontNormal")
+SimpleCoin.realm_select:RegisterForClicks("LeftButtonUp")
 -- realm menu
--- SimpleCoin.realm_select = CreateFrame("Frame", "Omen_TitleDropDownMenu")
--- SimpleCoin.realm_select.displayMode = "MENU"
--- SimpleCoin.realm_select.initialize = function(self, level) end
+SimpleCoin.realm_select_menu = CreateFrame("Frame", "$parent__RealmSelectMenu")
+SimpleCoin.realm_select_menu.displayMode = "MENU"
+
 -- character list
 SimpleCoin.char_list = CreateFrame("Frame", "$parent_CharacterList", SimpleCoin.main_frame, sc_AddonBackdropTemplate)
 SimpleCoin.char_list:ClearAllPoints()
-SimpleCoin.char_list:SetPoint("TOPLEFT", 10, -30)
+SimpleCoin.char_list:SetPoint("TOPLEFT", 10, -60)
 SimpleCoin.char_list:SetPoint("BOTTOMRIGHT", -10, 144)
 SimpleCoin.char_list:SetBackdrop(
 	{
-		bgFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Background",
+		bgFile = "Interface\\addons\\SimpleCoin\\img\\Black-Background",
 		edgeFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Gold-Border",
-		tile = "true",
+		tile = true,
 		tileSize = 32,
-		edgeSize = 16
+		edgeSize = 16,
+		insets = {left = 4, right = 4, top = 4, bottom = 4}
 	}
 )
+SimpleCoin.char_list:SetBackdropColor(1, 1, 1, simplecoin_bg_med_opac)
+SimpleCoin.char_list:SetAlpha(1)
 -- scrollframe
 SimpleCoin.char_list.scrollframe = CreateFrame("ScrollFrame", "$parent_scroll", SimpleCoin.char_list, "UIPanelScrollFrameTemplate")
 SimpleCoin.char_list.scrollframe:ClearAllPoints()
@@ -135,14 +174,16 @@ SimpleCoin.main_frame.coin_display:SetPoint("LEFT", 10, 0)
 SimpleCoin.main_frame.coin_display:SetPoint("RIGHT", -10, 0)
 SimpleCoin.main_frame.coin_display:SetBackdrop(
 	{
-		bgFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Background",
+		bgFile = "Interface\\addons\\SimpleCoin\\img\\Black-Background",
 		edgeFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Gold-Border",
-		tile = "true",
+		tile = true,
 		tileSize = 32,
-		edgeSize = 16
+		edgeSize = 16,
+		insets = {left = 4, right = 4, top = 4, bottom = 4}
 	}
 )
-simplecoin_coin_widget(SimpleCoin.main_frame.coin_display, nil, {-4, -2, -4, 2}, true)
+SimpleCoin.main_frame.coin_display:SetBackdropColor(1, 1, 1, simplecoin_bg_med_opac)
+simplecoin_coin_widget(SimpleCoin.main_frame.coin_display, nil, {-4, -4, -4, 4}, true)
 -- Resize button
 SimpleCoin.resize = CreateFrame("Button", "$parent_Move", SimpleCoin, sc_AddonBackdropTemplate)
 SimpleCoin.resize:SetSize(16, 16)

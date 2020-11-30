@@ -1,5 +1,13 @@
 -- Setup DB
+SimpleCoinSettings = {}
 SimpleCoinData = {realms = {}}
+
+-- global functions
+simplecoin_bg_trans_opac = 0.5
+simplecoin_bg_med_opac = 0.9
+simplecoin_bg_heavy_opac = 0.95
+simplecoin_bg_solid = 1
+simplecoin_main_cw_height = 0
 
 -- wow versions
 local wowversion, wowbuild, wowdate, wowtocversion = GetBuildInfo()
