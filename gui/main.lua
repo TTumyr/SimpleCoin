@@ -1,7 +1,7 @@
 -- main window
 SimpleCoin = CreateFrame("Frame", "SimpleCoin", UIParent, sc_AddonBackdropTemplate)
 SimpleCoin:SetWidth(460)
-SimpleCoin:SetHeight(460)
+SimpleCoin:SetHeight(520)
 SimpleCoin:ClearAllPoints()
 SimpleCoin:SetPoint("CENTER", UIParent, "CENTER")
 SimpleCoin.title = GetAddOnMetadata("SimpleCoin", "Title")
@@ -9,18 +9,15 @@ SimpleCoin.version = GetAddOnMetadata("SimpleCoin", "Version")
 SimpleCoin:SetBackdrop(
 	{
 		bgFile = "Interface\\addons\\SimpleCoin\\img\\bg-marble",
-		edgeFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-TestWatermark-Border",
 		tile = false,
-		tileSize = 256,
-		edgeSize = 4,
-		insets = {left = 0, right = 0, top = 0, bottom = 0}
+		tileSize = 256
 	}
 )
 SimpleCoin:EnableMouse(true)
 -- set movable and resizeable
 simplecoin_set_resizable(SimpleCoin)
 simplecoin_set_movable(SimpleCoin)
-SimpleCoin:SetMinResize(260, 240)
+SimpleCoin:SetMinResize(310, 300)
 SimpleCoin:SetMaxResize(900, 600)
 SimpleCoin:SetFrameLevel(1)
 -- main display frame
@@ -30,8 +27,8 @@ SimpleCoin.main_frame:SetHeight(SimpleCoin.main_frame:GetParent():GetHeight() - 
 SimpleCoin.main_frame:ClearAllPoints()
 SimpleCoin.main_frame:SetPoint("TOPLEFT")
 SimpleCoin.main_frame:SetPoint("TOPRIGHT")
-SimpleCoin.main_frame:SetPoint("BOTTOMLEFT", 0, -30)
-SimpleCoin.main_frame:SetPoint("BOTTOMRIGHT", 0, -30)
+SimpleCoin.main_frame:SetPoint("BOTTOMLEFT", 0, 30)
+SimpleCoin.main_frame:SetPoint("BOTTOMRIGHT", 0, 30)
 -- set movable and resizeable
 simplecoin_set_resizable(SimpleCoin.main_frame)
 simplecoin_set_movable(SimpleCoin.main_frame)
@@ -106,25 +103,28 @@ SimpleCoin.btn_reset:SetHighlightFontObject(GameFontNormalSmall)
 SimpleCoin.btn_reset:SetText("ResetGUI")
 SimpleCoin.btn_reset:SetScript("OnClick", reset_windows)
 -- realm select button
-SimpleCoin.realm_select = CreateFrame("Button", "$parent_RealmSelect", SimpleCoin.main_frame, "OptionsButtonTemplate")
---SimpleCoin.realm_select:SetWidth(60)
+-- SimpleCoin.realm_select = CreateFrame("Button", "$parent_RealmSelect", SimpleCoin.main_frame, "UIMenuButtonStretchTemplate")
+SimpleCoin.realm_select = CreateFrame("Button", "$parent_RealmSelect", SimpleCoin.main_frame, "UIDropDownMenuTemplate")
+simplecoin_set_resizable(SimpleCoin.realm_select)
+UIDropDownMenu_SetWidth(SimpleCoin.realm_select, SimpleCoin.realm_select:GetParent():GetWidth() - 40)
+UIDropDownMenu_JustifyText(SimpleCoin.realm_select, "LEFT")
 SimpleCoin.realm_select:SetHeight(24)
-SimpleCoin.realm_select:SetPoint("TOPLEFT", 10, -40)
+SimpleCoin.realm_select:ClearAllPoints()
+SimpleCoin.realm_select:SetPoint("TOPLEFT", -6, -32)
 SimpleCoin.realm_select:SetPoint("TOPRIGHT", -10, -60)
--- Other code for the title's width/height/dragging to move Omen etc
-SimpleCoin.realm_select:SetScript(
+SimpleCoin.realm_select.Button:SetScript(
 	"OnClick",
 	function(self, button, down)
 		if button == "LeftButton" then
-			ToggleDropDownMenu(1, nil, SimpleCoin.realm_select_menu, self:GetName(), 0, 0)
+			ToggleDropDownMenu(1, nil, SimpleCoin.realm_select_menu, self:GetName(), -240, 0)
 		end
 	end
 )
 SimpleCoin.realm_select.realm_name = SimpleCoin.realm_select:CreateFontString()
-SimpleCoin.realm_select.realm_name:SetPoint("LEFT", 10, 0)
+SimpleCoin.realm_select.realm_name:SetPoint("TOPLEFT", 26, -8)
 SimpleCoin.realm_select.realm_name:SetFontObject("GameFontNormal")
 SimpleCoin.realm_select.realm_copper = SimpleCoin.realm_select:CreateFontString()
-SimpleCoin.realm_select.realm_copper:SetPoint("RIGHT", -10, 0)
+SimpleCoin.realm_select.realm_copper:SetPoint("TOPRIGHT", -32, -8)
 SimpleCoin.realm_select.realm_copper:SetFontObject("GameFontNormal")
 SimpleCoin.realm_select:RegisterForClicks("LeftButtonUp")
 -- realm menu
@@ -139,20 +139,20 @@ SimpleCoin.char_list:SetPoint("BOTTOMRIGHT", -10, 144)
 SimpleCoin.char_list:SetBackdrop(
 	{
 		bgFile = "Interface\\addons\\SimpleCoin\\img\\Black-Background",
-		edgeFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Gold-Border",
+		edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
 		tile = true,
 		tileSize = 32,
 		edgeSize = 16,
 		insets = {left = 4, right = 4, top = 4, bottom = 4}
 	}
 )
-SimpleCoin.char_list:SetBackdropColor(1, 1, 1, simplecoin_bg_med_opac)
+SimpleCoin.char_list:SetBackdropColor(1, 1, 1, simplecoin_bg_heavy_med_opac)
 SimpleCoin.char_list:SetAlpha(1)
 -- scrollframe
 SimpleCoin.char_list.scrollframe = CreateFrame("ScrollFrame", "$parent_scroll", SimpleCoin.char_list, "UIPanelScrollFrameTemplate")
 SimpleCoin.char_list.scrollframe:ClearAllPoints()
 SimpleCoin.char_list.scrollframe:SetAllPoints(SimpleCoin.char_list)
-SimpleCoin.char_list.scrollframe:SetPoint("TOPLEFT", -28, -8)
+SimpleCoin.char_list.scrollframe:SetPoint("TOPLEFT", 0, -8)
 SimpleCoin.char_list.scrollframe:SetPoint("BOTTOMRIGHT", -28, 6)
 SimpleCoin.char_list.scrollframe:SetWidth(SimpleCoin.char_list.scrollframe:GetParent():GetWidth())
 -- scroll child frame
@@ -175,14 +175,14 @@ SimpleCoin.main_frame.coin_display:SetPoint("RIGHT", -10, 0)
 SimpleCoin.main_frame.coin_display:SetBackdrop(
 	{
 		bgFile = "Interface\\addons\\SimpleCoin\\img\\Black-Background",
-		edgeFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-Gold-Border",
+		edgeFile = "Interface\\DialogFrame\\UI-DialogBox-Gold-Border",
 		tile = true,
 		tileSize = 32,
 		edgeSize = 16,
 		insets = {left = 4, right = 4, top = 4, bottom = 4}
 	}
 )
-SimpleCoin.main_frame.coin_display:SetBackdropColor(1, 1, 1, simplecoin_bg_med_opac)
+SimpleCoin.main_frame.coin_display:SetBackdropColor(1, 1, 1, simplecoin_bg_heavy_med_opac)
 simplecoin_coin_widget(SimpleCoin.main_frame.coin_display, nil, {-4, -4, -4, 4}, true)
 -- Resize button
 SimpleCoin.resize = CreateFrame("Button", "$parent_Move", SimpleCoin, sc_AddonBackdropTemplate)

@@ -80,9 +80,9 @@ else
 end
 -- setup datastorage
 function simplecoin_var_setup()
-    if (settings["realm_select_menu"] == nil) then
-        settings["realm_select_menu"] = {}
-    end
+    -- if (settings["realm_select_menu"] == nil) then
+    --     settings["realm_select_menu"] = {}
+    -- end
     if (data["realms"]["copper"] == nil) then
         data["realms"]["copper"] = 0
     end
@@ -166,22 +166,25 @@ function simplecoin_onevent(self, event)
     end
     if (event == "VARIABLES_LOADED") then
         -- setup data from saved variables
-        settings = SimpleCoinSettings
-        data = SimpleCoinData
+        simplecoin_get_saved_variables()
         simplecoin_var_setup()
-        -- interface configuration
-        simplecoin_gui_initial_setup()
-        simplecoin_realmselector_menu()
         -- get realm data
         simplecoin_get_static_copper()
         simplecoin_disp_screen_currency()
+        -- interface configuration
+        simplecoin_gui_initial_setup()
+        simplecoin_realmselector_menu()
         -- coin overlay and main coin frame
         simplecoin_update_display_cw_text(SimpleCoin_olay)
         simplecoin_update_display_cw_text(SimpleCoin.main_frame.coin_display)
-        -- error handling
-        simplecoin_error_handling()
     end
     if (event == "PLAYER_ENTERING_WORLD") then
+        simplecoin_get_saved_variables()
+        -- error handling
+        simplecoin_error_handling()
+        if (not data["realms"][sc_realm][sc_faction]["characters"][sc_player]) then
+            print("character not in data")
+        end
         if (data["realms"][sc_realm][sc_faction]["characters"][sc_player] ~= nil) then
             if (sc_faction_copper or sc_realm_copper or sc_total_copper == 0) then
                 simplecoin_get_session_copper()
@@ -329,7 +332,13 @@ end
 function simplecoin_update_display()
     -- set copper on realm selector
     if (SimpleCoin.realm_select.realm_name:GetText() == sc_realm) then
-        SimpleCoin.realm_select.realm_copper:SetText(colorTable["White"] .. simplecoin_reformat_coinstring(GetCoinTextureString(data["realms"][sc_realm]["copper"])))
+        if (SimpleCoin.realm_select.realm_copper ~= nil) then
+            if (data["realms"][sc_realm]["copper"] ~= nil) then
+                SimpleCoin.realm_select.realm_copper:SetText(colorTable["White"] .. simplecoin_reformat_coinstring(GetCoinTextureString(data["realms"][sc_realm]["copper"])))
+            else
+                SimpleCoin.realm_select.realm_copper:SetText(colorTable["White"] .. simplecoin_reformat_coinstring(GetCoinTextureString(getMoney)))
+            end
+        end
     end
     -- set total copper on character list display
     if (SimpleCoin.char_list.data[sc_realm][sc_faction] ~= nil) then
@@ -483,6 +492,36 @@ function simplecoin_realmselector_menu()
     SimpleCoin.realm_select.realm_name:SetText(sc_realm)
     local info = {}
     SimpleCoin.realm_select_menu.initialize = function(self, level)
+        function simplecoin_realm_menu_create_item(k)
+            if (k ~= "copper") then
+                if (data["realms"][k]["copper"] ~= nil) then
+                    info.text = "   " .. k .. "  --  " .. simplecoin_reformat_coinstring(GetCoinTextureString(data["realms"][k]["copper"]))
+                else
+                    info.text = "   " .. k .. "  --  " .. simplecoin_reformat_coinstring(GetCoinTextureString(getMoney))
+                end
+                --info.notCheckable = 1
+                if (SimpleCoin.realm_select.realm_name:GetText() == k) then
+                    info.checked = "Red Pill", true
+                else
+                    info.checked = false
+                end
+                info.func = function()
+                    if (data["realms"][k]["copper"] == nil) then
+                        if (k == sc_realm) then
+                            copper_string = getMoney
+                        else
+                            copper_string = 0
+                        end
+                    else
+                        copper_string = data["realms"][k]["copper"]
+                    end
+                    SimpleCoin.realm_select.realm_name:SetText(k)
+                    SimpleCoin.realm_select.realm_copper:SetText(colorTable["White"] .. simplecoin_reformat_coinstring(GetCoinTextureString(copper_string)))
+                    simplecoin_set_visible_realm(k)
+                end
+                UIDropDownMenu_AddButton(info, level)
+            end
+        end
         if not level then
             return
         end
@@ -497,16 +536,15 @@ function simplecoin_realmselector_menu()
             info.disabled = nil
             info.isTitle = nil
             info.notCheckable = nil
+
             for k, _ in pairs(data["realms"]) do
-                if (k ~= "copper") then
-                    info.text = "   " .. k .. "  --  " .. simplecoin_reformat_coinstring(GetCoinTextureString(data["realms"][k]["copper"]))
-                    info.notCheckable = 1
-                    info.func = function()
-                        SimpleCoin.realm_select.realm_name:SetText(k)
-                        SimpleCoin.realm_select.realm_copper:SetText(colorTable["White"] .. simplecoin_reformat_coinstring(GetCoinTextureString(data["realms"][k]["copper"])))
-                        simplecoin_set_visible_realm(k)
-                    end
-                    UIDropDownMenu_AddButton(info, level)
+                if (k ~= "copper" and k == sc_realm) then
+                    simplecoin_realm_menu_create_item(k)
+                end
+            end
+            for k, _ in pairs(data["realms"]) do
+                if (k ~= "copper" and k ~= sc_realm) then
+                    simplecoin_realm_menu_create_item(k)
                 end
             end
         end
@@ -527,12 +565,12 @@ function simplecoin_fill_main_data()
         SimpleCoin.char_list.data[realm][faction]:SetPoint("TOPLEFT")
         SimpleCoin.char_list.data[realm][faction]:SetPoint("TOPRIGHT")
         SimpleCoin.char_list.data[realm][faction].Symbol = CreateFrame("Frame", "$parent_Symbol", SimpleCoin.char_list.data[realm], sc_AddonBackdropTemplate)
-        SimpleCoin.char_list.data[realm][faction].Symbol:SetPoint("TOPLEFT", 30, charListy + 6)
+        SimpleCoin.char_list.data[realm][faction].Symbol:SetPoint("TOPLEFT", 4, charListy + 6)
         SimpleCoin.char_list.data[realm][faction].Symbol:SetWidth(20)
         SimpleCoin.char_list.data[realm][faction].Symbol:SetHeight(20)
         SimpleCoin.char_list.data[realm][faction].Symbol:SetBackdrop(
             {
-                bgFile = "Interface\\addons\\SimpleCoin\\img\\Battleground-" .. faction,
+                bgFile = "Interface\\BattlefieldFrame\\Battleground-" .. faction,
                 tile = 0,
                 tileSize = faction_tilesize_list
             }
@@ -541,7 +579,7 @@ function simplecoin_fill_main_data()
         SimpleCoin.char_list.data[realm][faction].Text = SimpleCoin.char_list.data[realm]:CreateFontString()
         SimpleCoin.char_list.data[realm][faction].Text:SetFontObject("GameFontNormalSmall")
         SimpleCoin.char_list.data[realm][faction].Text:SetText(faction)
-        SimpleCoin.char_list.data[realm][faction].Text:SetPoint("TOPLEFT", 50, charListy)
+        SimpleCoin.char_list.data[realm][faction].Text:SetPoint("TOPLEFT", 24, charListy)
         SimpleCoin.char_list.data[realm][faction].copper = SimpleCoin.char_list.data[realm]:CreateFontString()
         SimpleCoin.char_list.data[realm][faction].copper:SetFontObject("GameFontNormalSmall")
         SimpleCoin.char_list.data[realm][faction].copper:SetText(colorTable["White"] .. simplecoin_reformat_coinstring(GetCoinTextureString(data["realms"][realm][faction]["copper"])))
@@ -562,11 +600,11 @@ function simplecoin_fill_main_data()
         local character_copper = char_path[name]["copper"] or getMoney
         -- character frame
         self[name] = CreateFrame("Frame", "$parent_" .. name, self, sc_AddonBackdropTemplate)
-        self[name]:SetPoint("TOPLEFT", 40, charListy)
+        self[name]:SetPoint("TOPLEFT", 14, charListy)
         self[name]:SetPoint("TOPRIGHT", -4, charListy)
         self[name]:SetHeight(cL_char_h)
         -- delete button
-        if (name ~= sc_player) then
+        if ((realm == sc_realm and name ~= sc_player) or realm ~= sc_realm) then
             self[name].Delete = CreateFrame("Button", "$parent_Delete", self[name], "UIPanelCloseButton")
             self[name].Delete:SetPoint("TOPLEFT", 0, 0 + 5)
             self[name].Delete:SetWidth(20)
@@ -628,29 +666,61 @@ function simplecoin_fill_main_data()
         SimpleCoin.char_list.data[realm]:SetPoint("TOPRIGHT")
         -- first time player registers
         local player_found_in_data = false
-
-        for k, v in pairs(data["realms"][realm]) do
-            if (k ~= "copper") then
-                if table_length(data["realms"][realm][k]) > 0 then
-                    create_faction_plate(tostring(k))
-                    for kc, vc in pairs(data["realms"][realm][k]["characters"]) do
-                        if (kc == sc_player) then
-                            -- active character
-                            player_found_in_data = true
-                            create_character_string(SimpleCoin.char_list.data[realm][k], realm, k, "player", kc)
-                        end
-                        if (kc ~= sc_player) then
-                            -- other characters on realm
-                            create_character_string(SimpleCoin.char_list.data[realm][k], realm, k, "character", kc)
-                        end
-                    end
+        function sort_factions(k)
+            create_faction_plate(tostring(k))
+            for kc, _ in pairs(data["realms"][realm][k]["characters"]) do
+                if (kc == sc_player) then
+                    -- active character
+                    player_found_in_data = true
+                    create_character_string(SimpleCoin.char_list.data[realm][k], realm, k, "player", kc)
                 end
             end
+            for kc, _ in pairs(data["realms"][realm][k]["characters"]) do
+                if (kc ~= sc_player) then
+                    -- other characters on realm
+                    create_character_string(SimpleCoin.char_list.data[realm][k], realm, k, "character", kc)
+                end
+            end
+            charListy = charListy - ((cL_fac_h * 2) - (cL_char_h * 2))
+        end
+        -- create character faction on top and opposite of character faction last
+        if table_length(data["realms"][realm][sc_faction]) > 0 then
+            sort_factions(sc_faction)
+        end
+        if table_length(data["realms"][realm][sc_opposite_faction]) > 0 then
+            sort_factions(sc_opposite_faction)
         end
         -- keep for now
         -- if (player_found_in_data ~= true) then
         --     print("Welcome to SimpleCoin " .. colorTable[char_path[name]["class"]] .. sc_player)
         --     create_character_string(SimpleCoin.char_list.data[sc_realm][sc_faction], sc_realm, sc_faction, "player", sc_player)
+        -- end
+
+        -- for k, _ in pairs(data["realms"][realm]) do
+        --     if table_length(data["realms"][realm][k]) > 0 then
+        --         if (data["realms"][realm][k] == sc_faction) then
+        --             create_faction_plate(tostring(k))
+        --         end
+        --         for kc, _ in pairs(data["realms"][realm][k]["characters"]) do
+        --             if (kc == sc_player) then
+        --                 -- active character
+        --                 player_found_in_data = true
+        --                 create_character_string(SimpleCoin.char_list.data[realm][k], realm, k, "player", kc)
+        --             end
+        --         end
+        --         for kc, _ in pairs(data["realms"][realm][k]["characters"]) do
+        --             if (kc ~= sc_player) then
+        --                 -- other characters on realm
+        --                 create_character_string(SimpleCoin.char_list.data[realm][k], realm, k, "character", kc)
+        --             end
+        --         end
+        --         charListy = charListy - ((cL_fac_h * 2) - (cL_char_h * 2))
+        --     end
+        -- end
+
+        -- if (kc ~= sc_player) then
+        --     -- other characters on realm
+        --     create_character_string(SimpleCoin.char_list.data[realm][k], realm, k, "character", kc)
         -- end
     end
     -- create realm display
@@ -663,7 +733,7 @@ function simplecoin_fill_main_data()
     -- set initial visible realm
     simplecoin_set_visible_realm(sc_realm)
     -- set char_list.data height based on amount of lines/characters
-    SimpleCoin.char_list.data:SetHeight(math.abs(charListy))
+    --SimpleCoin.char_list.data:SetHeight(math.abs(charListy))
 end
 function table_length(tbl)
     local count = 0
@@ -694,7 +764,7 @@ function simplecoin_gui_initial_setup()
     function simplecoin_set_coinframe_icon(self, symbol)
         self:SetBackdrop(
             {
-                bgFile = "Interface\\addons\\SimpleCoin\\img\\Battleground-" .. symbol,
+                bgFile = "Interface\\BattlefieldFrame\\Battleground-" .. symbol,
                 tile = 0,
                 tileSize = faction_tilesize_overlay
             }
@@ -751,10 +821,14 @@ function simplecoin_frame_resize(self, motion, savename)
             self:GetParent().main_frame:ClearAllPoints()
             self:GetParent().main_frame:SetPoint("TOPLEFT")
             self:GetParent().main_frame:SetPoint("BOTTOMRIGHT", 0, 30)
+            self:GetParent().realm_select:ClearAllPoints()
+            self:GetParent().realm_select:SetPoint("TOPLEFT", -6, -32)
+            self:GetParent().realm_select:SetPoint("TOPRIGHT", -10, -60)
             -- scrollchild points has to be reset after scrolling on resizing
             self:GetParent().char_list.data:ClearAllPoints()
             self:GetParent().char_list.data:SetPoint("TOPLEFT")
             self:GetParent().char_list.data:SetPoint("TOPRIGHT")
+            self:GetParent().realm_select:Hide()
             self:GetParent():StartSizing("BOTTOMRIGHT")
         end
     )
@@ -763,6 +837,8 @@ function simplecoin_frame_resize(self, motion, savename)
         function(self, button)
             -- scrollchild width has to be set for correct scrolling
             self:GetParent().char_list.data:SetWidth(self:GetParent().char_list.data:GetParent():GetWidth())
+            UIDropDownMenu_SetWidth(SimpleCoin.realm_select, SimpleCoin.realm_select:GetParent():GetWidth() - 40)
+            self:GetParent().realm_select:Show()
             self:GetParent():StopMovingOrSizing()
         end
     )
@@ -813,9 +889,19 @@ function simplecoin_coin_pos(self)
     data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["coin_overlay"]["pos"] = {self:GetPoint()}
     sc_coin_hgt_crnd = true
 end
---
+----
+-- error handling
+----
+function simplecoin_get_saved_variables()
+    while (data == nil) do
+        data = SimpleCoinData
+    end
+end
 function simplecoin_error_handling()
     -- main window cw (incorrect size)
+    if (SimpleCoin.realm_select:GetParent():GetHeight() ~= SimpleCoin.realm_select:GetParent():GetWidth() - 40) then
+        UIDropDownMenu_SetWidth(SimpleCoin.realm_select, SimpleCoin.realm_select:GetParent():GetWidth() - 40)
+    end
     if (SimpleCoin.main_frame.coin_display:GetHeight() < simplecoin_main_cw_height or SimpleCoin.main_frame.coin_display:GetHeight() > simplecoin_main_cw_height) then
         SimpleCoin.main_frame.coin_display:SetHeight(simplecoin_main_cw_height)
     end

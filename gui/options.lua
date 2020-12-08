@@ -8,11 +8,8 @@ SimpleCoin.options:SetPoint("TOPRIGHT", SimpleCoin.main_frame, "TOPRIGHT", Simpl
 SimpleCoin.options:SetBackdrop(
     {
         bgFile = "Interface\\addons\\SimpleCoin\\img\\bg-marble",
-        edgeFile = "Interface\\addons\\SimpleCoin\\img\\UI-DialogBox-TestWatermark-Border",
         tile = false,
-        tileSize = 256,
-        edgeSize = 4,
-        insets = {left = 0, right = 1, top = 0, bottom = 1}
+        tileSize = 256
     }
 )
 SimpleCoin.options:SetMinResize(300, 200)
