@@ -93,7 +93,7 @@ SimpleCoin.btn_options:SetPushedTexture("Interface\\addons\\SimpleCoin\\img\\UI-
 SimpleCoin.btn_options:SetHighlightTexture("Interface\\addons\\SimpleCoin\\img\\UI-MicroButton-MainMenu-Down")
 SimpleCoin.btn_options:SetScript("OnClick", simplecoin_showoptions)
 -- resetGUI button
-SimpleCoin.btn_reset = CreateFrame("Button", "$parent_reset", SimpleCoin, "OptionsButtonTemplate")
+--[[ SimpleCoin.btn_reset = CreateFrame("Button", "$parent_reset", SimpleCoin, "OptionsButtonTemplate")
 SimpleCoin.btn_reset:SetWidth(60)
 SimpleCoin.btn_reset:SetHeight(20)
 SimpleCoin.btn_reset:SetPoint("BOTTOMRIGHT", -28, 10)
@@ -101,7 +101,7 @@ SimpleCoin.btn_reset:CreateTexture(nil, "ARTWORK")
 SimpleCoin.btn_reset:SetNormalFontObject(GameFontNormalSmall)
 SimpleCoin.btn_reset:SetHighlightFontObject(GameFontNormalSmall)
 SimpleCoin.btn_reset:SetText("ResetGUI")
-SimpleCoin.btn_reset:SetScript("OnClick", reset_windows)
+SimpleCoin.btn_reset:SetScript("OnClick", reset_windows) ]]
 -- realm select button
 -- SimpleCoin.realm_select = CreateFrame("Button", "$parent_RealmSelect", SimpleCoin.main_frame, "UIMenuButtonStretchTemplate")
 SimpleCoin.realm_select = CreateFrame("Button", "$parent_RealmSelect", SimpleCoin.main_frame, "UIDropDownMenuTemplate")
@@ -112,12 +112,19 @@ SimpleCoin.realm_select:SetHeight(24)
 SimpleCoin.realm_select:ClearAllPoints()
 SimpleCoin.realm_select:SetPoint("TOPLEFT", -6, -32)
 SimpleCoin.realm_select:SetPoint("TOPRIGHT", -10, -60)
+SimpleCoin.realm_select:SetScript(
+	"OnClick",
+	function(self, button, down)
+		PlaySound(799)
+		ToggleDropDownMenu(1, nil, SimpleCoin.realm_select_menu, self.Button:GetName(), -242, 0)
+	end
+)
 SimpleCoin.realm_select.Button:SetScript(
 	"OnClick",
 	function(self, button, down)
-		if button == "LeftButton" then
-			ToggleDropDownMenu(1, nil, SimpleCoin.realm_select_menu, self:GetName(), -240, 0)
-		end
+		--PlaySound(120)
+		PlaySound(799)
+		ToggleDropDownMenu(1, nil, SimpleCoin.realm_select_menu, self:GetName(), -242, 0)
 	end
 )
 SimpleCoin.realm_select.realm_name = SimpleCoin.realm_select:CreateFontString()

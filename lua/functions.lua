@@ -3,6 +3,8 @@ local sc_realm = GetRealmName()
 local sc_faction = UnitFactionGroup("player")
 local sc_player = GetUnitName("player")
 -- copper
+-- first entering world flag
+local first_enter = false
 local getMoney = 0
 local sc_player_copper = 0
 local sc_faction_copper = 0
@@ -189,7 +191,10 @@ function simplecoin_onevent(self, event)
             if (sc_faction_copper or sc_realm_copper or sc_total_copper == 0) then
                 simplecoin_get_session_copper()
             end
-            simplecoin_copperchange()
+            if (not first_enter) then
+                simplecoin_copperchange()
+                first_enter = true
+            end
         end
     end
     if (event == "PLAYER_MONEY") then
@@ -432,6 +437,7 @@ function simplecoin_disp_screen_currency()
     end
 end
 function simplecoin_showoptions()
+    PlaySound(799)
     if (SimpleCoin.options:IsVisible()) then
         SimpleCoin.options:Hide()
         SimpleCoin.btn_options:SetNormalTexture("Interface\\addons\\SimpleCoin\\img\\UI-MicroButton-MainMenu-Up")
@@ -800,11 +806,13 @@ end
 -- FRAME MANAGEMENT FUNCTIONS
 ----
 function simplecoin_closemain(self)
+    PlaySound(799)
     self:GetParent():GetParent():Hide()
     data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["mainwindow_show"] = false
 end
 -- toggle main options frame
 function simplecoin_showtoggle(self)
+    PlaySound(799)
     if (data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["mainwindow_show"] == false) then
         SimpleCoin:Show()
         data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["mainwindow_show"] = true
@@ -865,6 +873,7 @@ function simplecoin_olay_resize(self, motion, savename)
 end
 -- reset windows positions
 function reset_windows()
+    PlaySound(799)
     SimpleCoin:ClearAllPoints()
     SimpleCoin:SetPoint("CENTER", UIParent, "CENTER")
     SimpleCoin.options:ClearAllPoints()

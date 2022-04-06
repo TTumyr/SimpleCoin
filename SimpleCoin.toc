@@ -1,8 +1,9 @@
-## Interface: 90002
-# Interface: 11306
+## Interface: 90200
+# Interface: 20501
+# Interface: 13037
 ## Title: SimpleCoin
 ## Notes: Money logging tool across chaarcters and realms
-## Version: 0.2.1
+## Version: 0.2.2
 ## Author: Tumyr
 ## SavedVariables: SimpleCoinData
 ## DefaultState: enabled
