@@ -1,4 +1,4 @@
-## Interface: 11503
+## Interface: 11508
 ## Title: SimpleCoin
 ## Notes: Money logging tool across chaarcters and realms
 ## Version: 0.2.1
