@@ -29,6 +29,7 @@ local colorTable = {
     ["Death Knight"] = "|cffc41f3b",
     ["Demon Hunter"] = "|cffa330c9",
     ["Druid"] = "|cffff7d0a",
+    ["Evoker"] = "|cff33937f",
     ["Hunter"] = "|cffabd473",
     ["Mage"] = "|cff69ccf0",
     ["Monk"] = "|cff00ff96",
@@ -59,27 +60,31 @@ else
     faction_tilesize_overlay = 12
 end
 -- set up coin display shortend realm name
-if (#sc_realm > 10) then
-    local string_split = {strsplit(" ", sc_realm)}
-    local ret_string = {}
-    local long_str = math.max(#unpack(string_split))
-    local abbr_done = false
-    for k, v in pairs(string_split) do
-        if (#v == long_str and not abbr_done) then
-            if (#string_split > 1) then
-                tinsert(ret_string, string.sub(v, 1, 1) .. ".")
+function simplecoin_abbreviate_string(str)
+    if (#sc_realm > 10) then
+        local string_split = {strsplit(" ", sc_realm)}
+        local ret_string = {}
+        local long_str = math.max(#unpack(string_split))
+        local abbr_done = false
+        for k, v in pairs(string_split) do
+            if (#v == long_str and not abbr_done) then
+                if (#string_split > 1) then
+                    tinsert(ret_string, string.sub(v, 1, 1) .. ".")
+                else
+                    tinsert(ret_string, string.sub(v, 1, 10))
+                end
+                abbr_done = true
             else
-                tinsert(ret_string, string.sub(v, 1, 10))
+                tinsert(ret_string, v)
             end
-            abbr_done = true
-        else
-            tinsert(ret_string, v)
         end
+        sc_coin_realm = strjoin(" ", unpack(ret_string))
+    else
+        sc_coin_realm = sc_realm
     end
-    sc_coin_realm = strjoin(" ", unpack(ret_string))
-else
-    sc_coin_realm = sc_realm
 end
+--NOTE BYPASS realm abbreviation
+sc_coin_realm = sc_realm
 -- setup datastorage
 function simplecoin_var_setup()
     -- if (settings["realm_select_menu"] == nil) then
@@ -404,8 +409,9 @@ function simplecoin_disp_screen_currency()
             SimpleCoin_olay:SetPoint("CENTER", UIParent, "CENTER")
         end
     end
-    SimpleCoin_olay:SetMinResize(200, SimpleCoin_olay:GetHeight())
-    SimpleCoin_olay:SetMaxResize(700, SimpleCoin_olay:GetHeight())
+    --DEPRECATED
+    --SimpleCoin_olay:SetMinResize(200, SimpleCoin_olay:GetHeight())
+    --SimpleCoin_olay:SetMaxResize(700, SimpleCoin_olay:GetHeight())
     sc_coin_hgt_crnd = false
     --
     if (data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["coin_overlay"]["transparent"]) then

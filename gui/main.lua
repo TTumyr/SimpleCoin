@@ -17,8 +17,9 @@ SimpleCoin:EnableMouse(true)
 -- set movable and resizeable
 simplecoin_set_resizable(SimpleCoin)
 simplecoin_set_movable(SimpleCoin)
-SimpleCoin:SetMinResize(310, 300)
-SimpleCoin:SetMaxResize(900, 600)
+--Deprecated
+--SimpleCoin:SetMinResize(310, 300)
+--SimpleCoin:SetMaxResize(900, 600)
 SimpleCoin:SetFrameLevel(1)
 -- main display frame
 SimpleCoin.main_frame = CreateFrame("Frame", "$parent_MainFrame", SimpleCoin, sc_AddonBackdropTemplate)

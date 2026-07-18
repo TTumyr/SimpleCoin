@@ -1,6 +1,10 @@
+local vars = {
+    about_line1 = "SimpleCoin by Tumyr (Puma)",
+    about_line2 = "2020 - 2024"
+}
 SimpleCoin.options = CreateFrame("Frame", "$parent_Options", SimpleCoin.main_frame, sc_AddonBackdropTemplate)
 SimpleCoin.options:SetWidth(300)
-SimpleCoin.options:SetHeight(200)
+SimpleCoin.options:SetHeight(280)
 SimpleCoin.options:SetMovable(true)
 SimpleCoin.options:EnableMouse(true)
 SimpleCoin.options:ClearAllPoints()
@@ -12,15 +16,16 @@ SimpleCoin.options:SetBackdrop(
         tileSize = 256
     }
 )
-SimpleCoin.options:SetMinResize(300, 200)
-SimpleCoin.options:SetMaxResize(900, 600)
+--Deprecated
+--SimpleCoin.options:SetMinResize(300, 200)
+--SimpleCoin.options:SetMaxResize(900, 600)
 
 -- Checkboxes section
 SimpleCoin.options.chk_frame = CreateFrame("Frame", "$parent_Checkboxes", SimpleCoin.options, sc_AddonBackdropTemplate)
 SimpleCoin.options.chk_frame:SetWidth(SimpleCoin.options.chk_frame:GetParent():GetWidth())
 SimpleCoin.options.chk_frame:SetHeight(200)
 SimpleCoin.options.chk_frame:SetPoint("TOPLEFT", 0, 0)
-SimpleCoin.options.chk_frame:SetPoint("BOTTOMRIGHT", 0, 0)
+SimpleCoin.options.chk_frame:SetPoint("BOTTOMRIGHT", 0, 80)
 SimpleCoin.options.chk_frame:SetBackdrop(
     {
         bgFile = "Interface\\addons\\SimpleCoin\\img\\Black-Background",
@@ -55,4 +60,35 @@ local options_chk_boxes = {
 for k, v in pairs(options_chk_boxes) do
     simplecoin_chk_box(SimpleCoin.options.chk_frame, v.name, v.text, v.box_pnt, v.txt_pnt, v.toggle)
 end
+
+SimpleCoin.options.about = CreateFrame("Frame", "$parent_About", SimpleCoin.options, sc_AddonBackdropTemplate)
+SimpleCoin.options.about:SetHeight(80)
+SimpleCoin.options.about:SetPoint("TOPLEFT", 0, -200)
+SimpleCoin.options.about:SetPoint("BOTTOMRIGHT", 0, 0)
+SimpleCoin.options.about:SetBackdrop(
+            {
+                bgFile = "Interface\\addons\\SimpleCoin\\img\\Black-Background",
+                tile = true,
+                tileSize = 32
+            }
+        )
+SimpleCoin.options.about:SetBackdropColor(0, 0, 0, 0.97)
+SimpleCoin.options.about:SetClampedToScreen(true)
+-- About ttile
+SimpleCoin.options.about.label_title = SimpleCoin.options.about:CreateFontString()
+SimpleCoin.options.about.label_title:SetFontObject("GameFontNormal")
+SimpleCoin.options.about.label_title:SetText("About")
+SimpleCoin.options.about.label_title:SetPoint("CENTER", 0, 26)
+-- About lines
+SimpleCoin.options.about.label_line_1 = SimpleCoin.options.about:CreateFontString()
+SimpleCoin.options.about.label_line_1:SetFontObject("GameFontNormalSmall")
+SimpleCoin.options.about.label_line_1:SetTextColor(255,255,255,0.7)
+SimpleCoin.options.about.label_line_1:SetText(vars.about_line1)
+SimpleCoin.options.about.label_line_1:SetPoint("CENTER", 0, 0)
+SimpleCoin.options.about.label_line_2 = SimpleCoin.options.about:CreateFontString()
+SimpleCoin.options.about.label_line_2:SetFontObject("GameFontNormalSmall")
+SimpleCoin.options.about.label_line_2:SetTextColor(255,255,255,0.7)
+SimpleCoin.options.about.label_line_2:SetText(vars.about_line2)
+SimpleCoin.options.about.label_line_2:SetPoint("CENTER", 0, -14)
+
 SimpleCoin.options:Hide()

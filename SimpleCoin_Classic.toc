@@ -1,6 +1,4 @@
-# Interface: 90105
-# Interface: 20501
-## Interface: 11502
+## Interface: 11503
 ## Title: SimpleCoin
 ## Notes: Money logging tool across chaarcters and realms
 ## Version: 0.2.1
