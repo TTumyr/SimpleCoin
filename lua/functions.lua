@@ -238,18 +238,11 @@ function simplecoin_get_session_copper()
             end
         end
     end
-    -- realm copper from both factions
-    if (sc_realm_copper == 0) then
-        for k, v in pairs(realm) do
-            if (k ~= "copper") then
-                if (realm[k] ~= "copper" and realm[k]["copper"] ~= nil) then
-                    sc_realm_copper = sc_realm_copper + realm[k]["copper"]
-                end
-            end
-        end
-    end
+    -- realm copper from both factions (excluding current player)
+    sc_realm_copper = sc_faction_copper + sc_opposite_faction_copper
+
     if (data["realms"][sc_realm]["copper"] ~= nil) then
-        data["realms"][sc_realm]["copper"] = sc_realm_copper
+        data["realms"][sc_realm]["copper"] = sc_realm_copper + getMoney
     end
 end
 function simplecoin_get_static_copper()
