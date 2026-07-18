@@ -16,9 +16,7 @@ SimpleCoin.options:SetBackdrop(
         tileSize = 256
     }
 )
---Deprecated
---SimpleCoin.options:SetMinResize(300, 200)
---SimpleCoin.options:SetMaxResize(900, 600)
+simplecoin_set_resize_limits(SimpleCoin.options, 300, 200, 900, 600)
 
 -- Checkboxes section
 SimpleCoin.options.chk_frame = CreateFrame("Frame", "$parent_Checkboxes", SimpleCoin.options, sc_AddonBackdropTemplate)

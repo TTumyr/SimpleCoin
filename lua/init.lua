@@ -2,6 +2,11 @@
 SimpleCoinSettings = {}
 SimpleCoinData = {realms = {}}
 
+-- Global API Compatibility wrappers
+if not GetAddOnMetadata then
+    GetAddOnMetadata = C_AddOns and C_AddOns.GetAddOnMetadata
+end
+
 -- global functions
 simplecoin_bg_trans_opac = 0.1
 simplecoin_bg_med_light_opac = 0.3
@@ -13,15 +18,15 @@ simplecoin_main_cw_height = 0
 
 -- wow versions
 local wowversion, wowbuild, wowdate, wowtocversion = GetBuildInfo()
-local wowtextversion
+
+-- Defaults
+sc_wowtextversion = "Classic"
+sc_AddonBackdropTemplate = BackdropTemplateMixin and "BackdropTemplate"
+
 if wowtocversion < 19999 then
     sc_wowtextversion = "Classic"
-end
-if wowtocversion < 59999 then
+elseif wowtocversion < 59999 then
     sc_wowtextversion = "Classic"
-    sc_AddonBackdropTemplate = BackdropTemplateMixin and "BackdropTemplate"
-end
-if wowtocversion >= 90000 then
+elseif wowtocversion >= 90000 then
     sc_wowtextversion = "Retail"
-    sc_AddonBackdropTemplate = BackdropTemplateMixin and "BackdropTemplate"
 end

@@ -409,9 +409,7 @@ function simplecoin_disp_screen_currency()
             SimpleCoin_olay:SetPoint("CENTER", UIParent, "CENTER")
         end
     end
-    --DEPRECATED
-    --SimpleCoin_olay:SetMinResize(200, SimpleCoin_olay:GetHeight())
-    --SimpleCoin_olay:SetMaxResize(700, SimpleCoin_olay:GetHeight())
+    simplecoin_set_resize_limits(SimpleCoin_olay, 200, SimpleCoin_olay:GetHeight(), 700, SimpleCoin_olay:GetHeight())
     sc_coin_hgt_crnd = false
     --
     if (data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["coin_overlay"]["transparent"]) then
@@ -893,6 +891,14 @@ function simplecoin_set_resizable(self)
     self:SetResizable(true)
     self:SetUserPlaced(true)
     self:SetClampedToScreen(true)
+end
+function simplecoin_set_resize_limits(self, minWidth, minHeight, maxWidth, maxHeight)
+    if self.SetResizeBounds then
+        self:SetResizeBounds(minWidth, minHeight, maxWidth, maxHeight)
+    elseif self.SetMinResize and self.SetMaxResize then
+        self:SetMinResize(minWidth, minHeight)
+        self:SetMaxResize(maxWidth, maxHeight)
+    end
 end
 function simplecoin_set_movable(self)
     self:EnableMouse(true)
