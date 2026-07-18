@@ -355,7 +355,7 @@ function simplecoin_update_display()
     simplecoin_update_display_cw_copper(SimpleCoin.main_frame.coin_display)
     -- chat display
     if (data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["chatline_player"]) then
-        print(colorTable[UnitClass("player")] .. sc_player .. "|r: " .. simplecoin_reformat_coinstringsimplecoin_reformat_coinstring(GetCoinTextureString(getMoney)))
+        print(colorTable[UnitClass("player")] .. sc_player .. "|r: " .. simplecoin_reformat_coinstring(GetCoinTextureString(getMoney)))
     end
     if (data["realms"][sc_realm][sc_faction]["characters"][sc_player]["settings"]["chatline_allchars"]) then
         print("Total on " .. colorTable[UnitClass("player")] .. sc_realm .. "|r: " .. simplecoin_reformat_coinstring(GetCoinTextureString(sc_faction_copper + getMoney)))
